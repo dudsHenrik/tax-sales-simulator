@@ -1,10 +1,10 @@
 # Documento de Requisitos de Software (DRS) – Motor Fiscal
 
-**Versão:** 0.2 (rascunho)\
+**Versão:** 0.3 (rascunho)\
 **Autor:** Eduardo Henrique dos Santos Emilio\
-**Data:** 23/10/2026
+**Data:** 05/11/2026
 
-> Esta versão redefine o escopo: o Motor Fiscal é um simulador de valores de venda, sem leitura de XML. Pontos ainda abertos estão na seção 12.
+> Esta versão redefine o escopo: o Motor Fiscal é um simulador de valores de venda, sem leitura de XML. Pontos ainda abertos estão na seção 12. A versão 0.3 mantém o framework do front-end em aberto, entre React e Angular (seções 8 e 12).
 
 ## 1. Introdução e escopo
 
@@ -162,23 +162,37 @@ Alíquotas e códigos de tributação ficam em um banco PostgreSQL com data de v
 
 ## 8. Arquitetura e tecnologias
 
-A stack está definida: PostgreSQL para os parâmetros fiscais, C# com ASP.NET Core para o motor de cálculo e a API, React com Vite e Tailwind CSS no front-end e xUnit nos testes.
+A stack está definida, exceto o framework do front-end, ainda em avaliação entre React e Angular: PostgreSQL para os parâmetros fiscais, C# com ASP.NET Core para o motor de cálculo e a API, Tailwind CSS no estilo e xUnit nos testes.
 
 | Camada | Tecnologia | Por que |
 | --- | --- | --- |
 | Banco de dados | PostgreSQL (driver Npgsql, com EF Core ou Dapper) | Guarda alíquotas e códigos de tributação com vigência; o tipo `daterange` impede vigências sobrepostas. |
 | Back-end | C# com ASP.NET Core | Tipo `decimal` nativo para dinheiro; motor de cálculo isolado em biblioteca; API REST fina. |
-| Front-end | React com TypeScript, Vite e Tailwind CSS | Formulários que mudam por tipo de venda e comparação de cenários; stack muito pedida em vagas; Tailwind acelera o estilo. |
+| Front-end | **Opção A:** React com TypeScript e Vite. **Opção B:** Angular com TypeScript e Angular CLI. Nas duas, Tailwind CSS. | Formulários que mudam por tipo de venda e comparação de cenários; stack pedida em vagas; Tailwind acelera o estilo. Escolha em aberto (seção 12). |
 | Testes | xUnit | Casos por tipo de venda e por tributo com `[Theory]`, concentrados no motor de cálculo. |
 
 **Camadas**
 
-1. **Front-end (React, TypeScript, Vite e Tailwind CSS):** formulários, comparação de cenários e exibição da memória de cálculo.
+1. **Front-end (React ou Angular, com TypeScript e Tailwind CSS):** formulários, comparação de cenários e exibição da memória de cálculo.
 2. **API REST:** valida a entrada e expõe os endpoints de simulação e de consulta de parâmetros.
 3. **Motor de cálculo:** biblioteca separada, sem acesso a banco nem a rede, com funções puras e testáveis.
 4. **Repositório de parâmetros fiscais:** PostgreSQL com alíquotas e códigos de tributação, consultado por UF, NCM, regime e data (via Npgsql, com EF Core ou Dapper); não guarda simulações.
 
 Manter o motor isolado das camadas 2 e 4 é a decisão que mais pesa: ele concentra as regras fiscais, é o que mais muda com a legislação e pode ser testado sem subir API nem banco.
+
+**Front-end: React ou Angular (em avaliação).** A escolha afeta só a camada 1: o motor de cálculo, a API REST, o PostgreSQL e os testes em xUnit são iguais nas duas opções.
+
+| Critério | Opção A: React (Vite) | Opção B: Angular (CLI) |
+| --- | --- | --- |
+| Natureza | Biblioteca de interface; roteamento, formulários e estado vêm de bibliotecas escolhidas por nós. | Framework completo, com roteamento, formulários reativos, cliente HTTP e injeção de dependência incluídos. |
+| Formulários que mudam por tipo de venda (RNF06) | React Hook Form com Zod, por exemplo. | Reactive Forms nativos. |
+| Afinidade com C# | Menor: estilo funcional, com mais liberdade de organização. | Maior: classes, serviços injetados e tipagem forte. |
+| Mercado de vagas | Maior volume geral. | Forte em empresas grandes e sistemas corporativos. |
+| Curva de aprendizado | Menor no início, com mais decisões de arquitetura a tomar. | Maior no início, com mais convenções prontas. |
+| Build e execução | Vite (`npm run dev`). | Angular CLI (`ng serve`). |
+| Tailwind CSS | Suportado. | Suportado. |
+
+A decisão deve sair antes do marco 1 (seção 11), que entrega a tela mínima. Depois dela, esta seção e a seção 12 passam a citar só o framework escolhido.
 
 ## 9. Requisitos não funcionais
 
@@ -226,12 +240,13 @@ O projeto é longo, então cada marco entrega algo utilizável e termina com um 
 
 ## 12. Pontos em aberto
 
-Quatro decisões ainda mudam o escopo ou o desenho e precisam de resposta antes do marco 2.
+Cinco decisões ainda mudam o escopo ou o desenho: o framework do front-end precisa de resposta antes do marco 1 e as demais, antes do marco 2.
 
 - [ ] **Regime do vendedor:** a v1 cobre Lucro Presumido e Lucro Real, ou inclui também o Simples Nacional, que tem cálculo próprio?
 - [ ] **Definições de lucro, markup e rentabilidade:** a seção 4 adota lucro como meta sobre o preço, markup como preço ÷ custo e rentabilidade sobre a receita líquida; confirmar ou ajustar.
 - [x] **Persistência:** decidido: o banco guarda só alíquotas e códigos de tributação; simulações não são gravadas e a comparação de cenários vive só na sessão do navegador.
-- [x] **Stack:** decidido: PostgreSQL, C# com ASP.NET Core, React com Vite e Tailwind CSS, e xUnit nos testes (seção 8).
+- [x] **Stack (exceto front-end):** decidido: PostgreSQL, C# com ASP.NET Core, Tailwind CSS e xUnit nos testes (seção 8).
+- [ ] **Framework do front-end:** React (com Vite) ou Angular (com Angular CLI)? A seção 8 compara as duas opções; motor, API e banco não mudam com a escolha.
 
 ## 13. Fontes
 

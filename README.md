@@ -40,12 +40,14 @@ A transição da Reforma Tributária (2026 a 2033) é tratada pela **data de ref
 | --- | --- |
 | Banco de dados | PostgreSQL |
 | Back-end | C# com ASP.NET Core |
-| Front-end | React, Vite e Tailwind CSS |
+| Front-end | React (Vite) ou Angular (CLI), com Tailwind CSS. Em avaliação. |
 | Testes | xUnit |
+
+> **Front-end em aberto:** o framework ainda não foi escolhido entre React e Angular. A escolha afeta só a pasta `web/`; o motor de cálculo, a API, o banco e os testes são os mesmos. A comparação está na seção 8 do DRS.
 
 ## Arquitetura
 
-1. **Front-end (React):** formulários que mudam conforme o tipo de venda, comparação de cenários e memória de cálculo.
+1. **Front-end (React ou Angular):** formulários que mudam conforme o tipo de venda, comparação de cenários e memória de cálculo.
 2. **API REST (ASP.NET Core):** valida a entrada e expõe os endpoints de simulação e de consulta de parâmetros.
 3. **Motor de cálculo (biblioteca C#):** regras fiscais em funções puras, sem acesso a banco nem a rede, o que permite testá-las isoladamente.
 4. **PostgreSQL:** guarda apenas alíquotas e códigos de tributação, com data de vigência. Nenhuma simulação é gravada.
@@ -67,7 +69,7 @@ simulador-venda-fiscal/
 │   └── SimuladorFiscal.Api/       # ASP.NET Core
 ├── tests/
 │   └── SimuladorFiscal.Core.Tests/  # xUnit
-└── web/                           # React + TypeScript + Vite + Tailwind
+└── web/                           # React (Vite) ou Angular (CLI), com TypeScript + Tailwind
 ```
 
 ## Como rodar (previsto)
@@ -83,10 +85,15 @@ Os comandos abaixo valem quando o projeto for criado; ajuste os nomes conforme a
 # 2. API
 dotnet run --project src/SimuladorFiscal.Api
 
-# 3. Front-end
+# 3. Front-end, opção A: React com Vite
 cd web
 npm install
 npm run dev
+
+# 3. Front-end, opção B: Angular
+cd web
+npm install
+npm start    # executa ng serve
 ```
 
 ## Testes
